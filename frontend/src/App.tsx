@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { bitable, ITable, IAttachmentField, Selection } from "@lark-base-open/js-sdk";
-import { Button, Divider, Image, Space, Typography, Toast, Spin, Form, Card, Tooltip, Popconfirm, Banner } from '@douyinfe/semi-ui';
+import { Button, Divider, Image, Space, Typography, Toast, Spin, Form, Card, Tooltip, Popconfirm, Banner, Input } from '@douyinfe/semi-ui';
 import imageCompression from 'browser-image-compression';
 import { cloneDeep, debounce } from "lodash";
 import { IconInfoCircle } from "@douyinfe/semi-icons";
@@ -69,7 +69,38 @@ export default function App() {
 
   const patternRef = useRef(pattern); // 使用 useRef 来跟踪 pattern 的最新值
 
+  const [inputLongUrl, setInputLongUrl] = useState('');
+  const [outputShorUrl, setOutputShorUrl] = useState('');
 
+  const handleClick = async () => {
+    const shortUrl = await getShorUrl(inputLongUrl);
+    setOutputShorUrl(shortUrl);
+  };
+
+  // 调用生成短链接接口
+  async function getShorUrl(longUrl: string): Promise<string> {
+
+    const formData = new FormData();
+    formData.append('long_url', longUrl);
+
+    const response = await fetch('/api/shorten_url', {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+    const responseData = await response.json();
+    console.log(responseData.code, responseData.short_url);
+    console.log("getShorUrl Response Data:", responseData);
+    return responseData.short_url;
+  }
+
+  const copyToClipboard = () => {
+    console.log('outputShorUrl: ', outputShorUrl);
+    navigator.clipboard.writeText(outputShorUrl);
+    alert('Copied to clipboard!');
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -403,6 +434,29 @@ export default function App() {
         {
           imageRecordList.length > 0 ? <ImageListEl /> : ` ${pattern === 'cell' ? t('text_cell') : t('text_field')}`
         }
+
+        <Divider margin='12px' />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* 输入框 */}
+          <Input 
+            placeholder="请输入内容"
+            value={inputLongUrl}
+            onChange={(e) => setInputLongUrl(e)}
+          />
+
+          {/* 生成按钮 */}
+          <Button onClick={handleClick}>生成短链接</Button>
+
+          {/* 输出框 */}
+          <Input
+            readOnly
+            value={outputShorUrl}
+            style={{ marginTop: '16px' }}
+          />
+
+          <button onClick={copyToClipboard}>Copy to Clipboard</button>
+
+        </div>
 
       </main>
     </Spin>
