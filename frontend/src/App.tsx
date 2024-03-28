@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { bitable, ITable, IAttachmentField, Selection } from "@lark-base-open/js-sdk";
-import { Button, Divider, Image, Space, Typography, Toast, Spin, Form, Card, Tooltip, Popconfirm, Banner, Input } from '@douyinfe/semi-ui';
+import { Button, Divider, Image, Space, Typography, Toast, Spin, Form, Card, Tooltip, Popconfirm, Banner, Input} from '@douyinfe/semi-ui';
+import { IconLink } from '@douyinfe/semi-icons';
+
 import imageCompression from 'browser-image-compression';
 import { cloneDeep, debounce } from "lodash";
 import { IconInfoCircle } from "@douyinfe/semi-icons";
@@ -71,6 +73,7 @@ export default function App() {
 
   const [inputLongUrl, setInputLongUrl] = useState('');
   const [outputShorUrl, setOutputShorUrl] = useState('');
+  const { Paragraph, Text } = Typography;
 
   const handleClick = async () => {
     const shortUrl = await getShorUrl(inputLongUrl);
@@ -387,10 +390,10 @@ export default function App() {
   return (
     <Spin spinning={loading}>
       <main className="main" >
-        <Banner
+        {/* <Banner
           type="info"
           description={t('banner') + '      ' + WHITE_LIST.join(' , ').toLocaleUpperCase() + '.' + t('banner_tip')}
-        />
+        /> */}
         <Card >
 
           <Form onValueChange={values => {
@@ -398,26 +401,15 @@ export default function App() {
             setCompressNum(values.compressNum as number)
 
           }} initValues={{ compressNum, pattern }}>
-            <Form.Section text={t('title')}>
-              {/* <Form.Slider max={100} min={1} field='compressNum' label={
-                <Space>
-                  <span> {t('size')}:{compressNum}</span>
-                  <Tooltip content={t('tip')}>
-                    <IconInfoCircle />
-
-                  </Tooltip>
-                </Space>
-              } /> */}
-
-              <Form.Select field='pattern' label={t('mode')} onChange={e => onPatternChange(e as string)}>
+          <Form.Section text={t('title')}>
+              {/* <Form.Select field='pattern' label={t('mode')} onChange={e => onPatternChange(e as string)}>
                 <Form.Select.Option value="cell">{t('cell')}</Form.Select.Option>
                 <Form.Select.Option value="field">{t('field')}</Form.Select.Option>
-              </Form.Select>
-
+              </Form.Select> */}
             </Form.Section>
           </Form>
 
-          <Space>
+          {/* <Space>
             <Button disabled={imageRecordList.length === 0 || loading} theme='solid' onClick={handleCompress} >{t('remove_bg')}</Button>
             <Popconfirm
               title={t('popconfirm')}
@@ -427,36 +419,38 @@ export default function App() {
             </Popconfirm>
 
           </Space>
-        </Card>
 
+          <Divider margin='12px'/> */}
+
+          <Space>
+            <IconLink />
+            <Input 
+              showClear defaultValue='click to clear'
+              placeholder="请输入要缩短的长链接"
+              value={inputLongUrl}
+              onChange={(e) => setInputLongUrl(e)}
+            />
+            <Button onClick={handleClick}>生成短链接</Button>
+
+            {/* <button onClick={copyToClipboard}>Copy to Clipboard</button> */}
+          </Space>
+          <div>
+            <br />
+            <Paragraph copyable={{ content: outputShorUrl, onCopy: () => Toast.success({ content: '复制文本成功' }) }}>
+               <span ><Text strong>{`短链接：`}</Text><span>{outputShorUrl}</span> </span> 
+            </Paragraph>
+
+          </div>
+          
+        </Card>
+{/* 
         <Divider margin='12px' />
 
         {
           imageRecordList.length > 0 ? <ImageListEl /> : ` ${pattern === 'cell' ? t('text_cell') : t('text_field')}`
         }
 
-        <Divider margin='12px' />
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {/* 输入框 */}
-          <Input 
-            placeholder="请输入内容"
-            value={inputLongUrl}
-            onChange={(e) => setInputLongUrl(e)}
-          />
-
-          {/* 生成按钮 */}
-          <Button onClick={handleClick}>生成短链接</Button>
-
-          {/* 输出框 */}
-          <Input
-            readOnly
-            value={outputShorUrl}
-            style={{ marginTop: '16px' }}
-          />
-
-          <button onClick={copyToClipboard}>Copy to Clipboard</button>
-
-        </div>
+        <Divider margin='12px' /> */}
 
       </main>
     </Spin>
