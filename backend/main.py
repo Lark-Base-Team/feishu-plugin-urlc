@@ -12,7 +12,7 @@ import base62
 from loguru import logger
 
 logger.remove()
-logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
+logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 
 
 DULPLICATED = "DULPLICATED888"
