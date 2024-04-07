@@ -87,6 +87,7 @@ def shorten_url_to_db(long_url: str) -> str:
 def batch_shorten_url():
     """接收处理long url列表
     body: 待处理url
+    field_value_list: 
     [
         {
             "record_id": "recm2bS5GV",
@@ -100,12 +101,12 @@ def batch_shorten_url():
     if request.method != "POST":
         return
     long_urls: List[Dict] = request.get_json()
-    if not long_urls:
-        return jsonify({"code": 1000, "msg": "need param long_url"})
+    if (not long_urls) or ('field_value_list' not in long_urls.keys()):
+        return jsonify({"code": 1000, "msg": "need param field_value_list"})
     
     data_list = []
     try:
-        for d in long_urls:
+        for d in long_urls.get('field_value_list'):
             if not ('record_id' in d.keys() and 'text' in d.keys()):
                 continue
             cur_res = {

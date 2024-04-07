@@ -6,7 +6,7 @@ if [ ! -d "frontend" ]; then
     exit 1
 fi
 
-cd frontend/
+cd frontendV2/
 
 if [ "$1" == "yes" ]; then
     npm install
@@ -15,7 +15,7 @@ fi
 npm run build
 rm -f ../backend/static/assets/*
 
-sed -i 's#"/assets/#"/static/assets/#' dist/index.html
+sed -i 's#"./assets/#"/static/assets/#' dist/index.html
 # cp file to py server
 cp dist/assets/* ../backend/static/assets/
 cp dist/index.html ../backend/templates/dist/

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "feishu_plugin_rembg"
+name = "feishu_plugin_urlc"
 version = "0.1.0"
-description = "a feishu plugin for turning long url to shor url"
+description = "a feishu plugin for shortening url"
 authors = ["liujun"]
 
 [tool.poetry.dependencies]
@@ -11,6 +11,7 @@ gunicorn = "^21.2.0"
 mmh3 = "^4.1.0"
 pybase62 = "^1.0.0"
 Flask-SQLAlchemy = "^3.1.1"
+loguru = "^0.7.2"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
