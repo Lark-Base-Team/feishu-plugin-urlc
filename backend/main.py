@@ -48,14 +48,14 @@ def generate_short_url(long_url):
         print(f"generate_short_url error: {e}")
     return res
 
+
 def shorten_url_to_db(long_url: str) -> str:
-    """缩短链接并插入到数据库中
-    """
+    """缩短链接并插入到数据库中"""
     if not long_url:
-        return ''
+        return ""
     short_url = generate_short_url(long_url)
     if not short_url:
-        return f'generate_short_url failed, input longurl: {long_url}'
+        return f"generate_short_url failed, input longurl: {long_url}"
     sl: ShortLink = ShortLink.query.filter_by(short_key=short_url).first()
     logger.debug(f"short_url: {short_url}, long_url: {long_url}")
     if not sl:
@@ -83,11 +83,12 @@ def shorten_url_to_db(long_url: str) -> str:
 
     return short_url
 
+
 @app.route("/api/shorten_urls", methods=["POST"])
 def batch_shorten_url():
     """接收处理long url列表
     body: 待处理url
-    field_value_list: 
+    field_value_list:
     [
         {
             "record_id": "recm2bS5GV",
@@ -95,39 +96,49 @@ def batch_shorten_url():
         }, ...
     ]
     """
-    logger.debug(f'req url: {request.host_url}')
+    logger.debug(f"req url: {request.host_url}")
     host_url = request.host_url
 
     if request.method != "POST":
         return
     long_urls: List[Dict] = request.get_json()
-    if (not long_urls) or ('field_value_list' not in long_urls.keys()):
+    if (not long_urls) or ("field_value_list" not in long_urls.keys()):
         return jsonify({"code": 1000, "msg": "need param field_value_list"})
-    
+
     data_list = []
     try:
-        for d in long_urls.get('field_value_list'):
-            if not ('record_id' in d.keys() and 'text' in d.keys()):
+        for d in long_urls.get("field_value_list"):
+            if not ("record_id" in d.keys() and "text" in d.keys()):
                 continue
-            cur_res = {
-                'record_id': d['record_id'],
-                'text': host_url + shorten_url_to_db(d['text'])
-            }
+            cur_url: str = d["text"]
+            shortened_res = f"{cur_url}生成失败"
+            if (
+                cur_url
+                and isinstance(cur_url, str)
+                and any((cur_url.startswith("http://"), cur_url.startswith("https://")))
+            ):
+                shortened_res = host_url + shorten_url_to_db(d["text"])
+            else:
+                shortened_res = "请输入http://或者https://开头的网址"
+
+            cur_res = {"record_id": d["record_id"], "text": shortened_res}
             data_list.append(cur_res)
 
     except Exception as e:
-        logger.error(f'shorten_urls error, process {long_urls}, {e}')
-        return jsonify({"code": 2000, "msg": f"转换失败, {long_urls}, {e}", "data": data_list})
-
+        logger.error(f"shorten_urls error, process {long_urls}, {e}")
+        return jsonify(
+            {"code": 2000, "msg": f"转换失败, {long_urls}, {e}", "data": data_list}
+        )
 
     return jsonify({"code": 0, "msg": "success", "data": data_list})
+
 
 @app.route("/api/shorten_url", methods=["POST"])
 def shorten_url():
     """接收处理单个long url
     form['long_url']: 待处理url
     """
-    logger.debug(f'req url: {request.host_url}')
+    logger.debug(f"req url: {request.host_url}")
     host_url = request.host_url
 
     if request.method != "POST":
@@ -164,13 +175,13 @@ def shorten_url():
             db_session.add(new_sl)
             db_session.commit()
 
-    return jsonify({"code": 0, "msg": "success", "short_url": host_url+short_url})
+    return jsonify({"code": 0, "msg": "success", "short_url": host_url + short_url})
 
 
 @app.route("/<string:short_key>", methods=["GET"])
 def redirect_source_url(short_key):
     """传入短连后重定向到到原链接"""
-    logger.debug(f'req url: {request.url}')
+    logger.debug(f"req url: {request.url}")
     sl: ShortLink = ShortLink.query.filter_by(short_key=short_key).first()
     if not sl:
         abort(404)
@@ -181,5 +192,5 @@ def redirect_source_url(short_key):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True, ssl_context='adhoc')
+    app.run(host="0.0.0.0", port=8080, debug=True, ssl_context="adhoc")
     # app.run(host="0.0.0.0", port=8080, debug=True)
