@@ -180,7 +180,7 @@ def shorten_url():
 
 @app.route("/<string:short_key>", methods=["GET"])
 def redirect_source_url(short_key):
-    """传入短连后重定向到到原链接"""
+    """传入短链后重定向到到原链接"""
     logger.debug(f"req url: {request.url}")
     sl: ShortLink = ShortLink.query.filter_by(short_key=short_key).first()
     if not sl:

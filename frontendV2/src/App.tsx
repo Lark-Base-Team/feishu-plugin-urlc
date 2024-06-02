@@ -148,6 +148,7 @@ function Translate() {
           m.map(async (meta) => {
             switch (meta.type) {
               case FieldType.Text:
+              case FieldType.Url:
                 textArr.push(meta);
                 break;
               case FieldType.SingleSelect:
@@ -231,7 +232,7 @@ function Translate() {
             fields:
             {
               [targetFieldId]: [
-                { type: IOpenSegmentType.Text, text: text },
+                { type: IOpenSegmentType.Url, text: text, link: text },
               ]
             }
           })
